@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Netflix Skip it!",
   "version": "1.4",
   "description": "Skips Intros & Disables the interrupter",
@@ -9,7 +9,17 @@
   "permissions": [
     "storage"
   ],
-  "browser_action": {
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{3c030882-9f90-4fac-887f-959b9172d9c9}",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    }
+  },
+  "action": {
     "default_icon": "icon/nsi.png",
     "default_title": "Netflix Skip it! Settings",
     "default_popup": "popup.html"
