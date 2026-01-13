@@ -1,28 +1,82 @@
-var exec = false;
-function pauseExec() {
-  setTimeout(function() {
+let exec = false;
+let settings = {
+  enableExtension: true,
+  skipInterrupter: true,
+  skipIntro: true
+};
+
+// Settings
+if (typeof browser !== "undefined" && browser.storage) {
+  (async () => {
+    try {
+      const result = await browser.storage.local.get({
+        enableExtension: true,
+        skipInterrupter: true,
+        skipIntro: true
+      });
+      settings = result;
+    } catch (error) {
+      console.error("Error loading settings:", error);
+    }
+  })();
+
+  browser.storage.onChanged.addListener((changes, area) => {
+    if (area === "local") {
+      if (changes.enableExtension) {
+        settings.enableExtension = changes.enableExtension.newValue;
+      }
+      if (changes.skipInterrupter) {
+        settings.skipInterrupter = changes.skipInterrupter.newValue;
+      }
+      if (changes.skipIntro) {
+        settings.skipIntro = changes.skipIntro.newValue;
+      }
+    }
+  });
+}
+
+
+const pauseExec = () => {
+  setTimeout(() => {
     exec = false;
   }, 2000);
-}
-function check_btns() {
-  var inter_btn = document.querySelector("[data-uia='interrupt-autoplay-continue']");
-  var skip_btn = document.querySelector(".watch-video--skip-content-button");
-  if (inter_btn) {
-    exec = true;
-    console.log("Found interrupter");
-    inter_btn.click();
-    pauseExec();
+};
+
+const checkAndClick = () => {
+  if (!settings.enableExtension || exec) return;
+
+  // Interrupter Logic
+  if (settings.skipInterrupter) {
+    const inter_btn = document.querySelector("[data-uia='interrupt-autoplay-continue']");
+    if (inter_btn) {
+      console.log("Found interrupter");
+      exec = true;
+      inter_btn.click();
+      pauseExec();
+      return;
+    }
   }
-  if (skip_btn) {
-    exec = true;
-    console.log("Found Skip button");
-    skip_btn.click();
-    pauseExec();
+
+  // Skip Intro Logic
+  if (settings.skipIntro) {
+    const skip_btn = document.querySelector("[data-uia='player-skip-intro']");
+    if (skip_btn) {
+      console.log("Found Skip button");
+      exec = true;
+      skip_btn.click();
+      pauseExec();
+    }
   }
-}
-function main() {
-  if (!exec) {
-    check_btns();
-  }
-}
-setInterval(main, 200);
+};
+
+//  Initialization
+const observer = new MutationObserver((mutations) => {
+  checkAndClick();
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+
+checkAndClick();
