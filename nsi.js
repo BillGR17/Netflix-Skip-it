@@ -2,7 +2,8 @@ let exec = false;
 let settings = {
   enableExtension: true,
   skipInterrupter: true,
-  skipIntro: true
+  skipIntro: true,
+  nextEpisode: false
 };
 
 // Settings
@@ -12,7 +13,8 @@ if (typeof browser !== "undefined" && browser.storage) {
       const result = await browser.storage.local.get({
         enableExtension: true,
         skipInterrupter: true,
-        skipIntro: true
+        skipIntro: true,
+        nextEpisode: false
       });
       settings = result;
     } catch (error) {
@@ -30,6 +32,9 @@ if (typeof browser !== "undefined" && browser.storage) {
       }
       if (changes.skipIntro) {
         settings.skipIntro = changes.skipIntro.newValue;
+      }
+      if (changes.nextEpisode) {
+        settings.nextEpisode = changes.nextEpisode.newValue;
       }
     }
   });
@@ -64,6 +69,18 @@ const checkAndClick = () => {
       console.log("Found Skip button");
       exec = true;
       skip_btn.click();
+      pauseExec();
+      return;
+    }
+  }
+
+  // Next Episode Logic
+  if (settings.nextEpisode) {
+    const next_btn = document.querySelector("[data-uia='next-episode-seamless-button']");
+    if (next_btn) {
+      console.log("Found Next Episode button");
+      exec = true;
+      next_btn.click();
       pauseExec();
     }
   }

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Netflix Skip it!",
-  "version": "1.4",
+  "version": "1.5",
   "description": "Skips Intros & Disables the interrupter",
   "icons": {
     "48": "icon/nsi.png"

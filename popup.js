@@ -1,30 +1,48 @@
+const features = [{
+    id: "skipInterrupter",
+    optionId: "skipInterrupterOption",
+    default: true
+  },
+  {
+    id: "skipIntro",
+    optionId: "skipIntroOption",
+    default: true
+  },
+  {
+    id: "nextEpisode",
+    optionId: "nextEpisodeOption",
+    default: false
+  }
+];
+
 const updateUI = () => {
   const enableExtension = document.querySelector("#enableExtension").checked;
-  const skipInterrupterOption = document.querySelector("#skipInterrupterOption");
-  const skipInterrupterInput = document.querySelector("#skipInterrupter");
-  const skipIntroOption = document.querySelector("#skipIntroOption");
-  const skipIntroInput = document.querySelector("#skipIntro");
 
-  if (enableExtension) {
-    skipInterrupterOption.classList.remove("disabled");
-    skipInterrupterInput.disabled = false;
-    skipIntroOption.classList.remove("disabled");
-    skipIntroInput.disabled = false;
-  } else {
-    skipInterrupterOption.classList.add("disabled");
-    skipInterrupterInput.disabled = true;
-    skipIntroOption.classList.add("disabled");
-    skipIntroInput.disabled = true;
-  }
+  features.forEach(feature => {
+    const option = document.getElementById(feature.optionId);
+    const input = document.getElementById(feature.id);
+
+    if (enableExtension) {
+      option.classList.remove("disabled");
+      input.disabled = false;
+    } else {
+      option.classList.add("disabled");
+      input.disabled = true;
+    }
+  });
 };
 
 const saveOptions = async () => {
   try {
-    await browser.storage.local.set({
-      enableExtension: document.querySelector("#enableExtension").checked,
-      skipInterrupter: document.querySelector("#skipInterrupter").checked,
-      skipIntro: document.querySelector("#skipIntro").checked
+    const settings = {
+      enableExtension: document.querySelector("#enableExtension").checked
+    };
+
+    features.forEach(feature => {
+      settings[feature.id] = document.getElementById(feature.id).checked;
     });
+
+    await browser.storage.local.set(settings);
     updateUI();
   } catch (error) {
     console.error(`Error saving settings: ${error}`);
@@ -33,14 +51,20 @@ const saveOptions = async () => {
 
 const restoreOptions = async () => {
   try {
-    const result = await browser.storage.local.get({
-      enableExtension: true,
-      skipInterrupter: true,
-      skipIntro: true
+    const defaults = {
+      enableExtension: true
+    };
+    features.forEach(feature => {
+      defaults[feature.id] = feature.default;
     });
+
+    const result = await browser.storage.local.get(defaults);
+
     document.querySelector("#enableExtension").checked = result.enableExtension;
-    document.querySelector("#skipInterrupter").checked = result.skipInterrupter;
-    document.querySelector("#skipIntro").checked = result.skipIntro;
+    features.forEach(feature => {
+      document.getElementById(feature.id).checked = result[feature.id];
+    });
+
     updateUI();
   } catch (error) {
     console.error(`Error loading settings: ${error}`);
@@ -49,5 +73,7 @@ const restoreOptions = async () => {
 
 document.addEventListener("DOMContentLoaded", restoreOptions);
 document.querySelector("#enableExtension").addEventListener("change", saveOptions);
-document.querySelector("#skipInterrupter").addEventListener("change", saveOptions);
-document.querySelector("#skipIntro").addEventListener("change", saveOptions);
+
+features.forEach(feature => {
+  document.getElementById(feature.id).addEventListener("change", saveOptions);
+});
