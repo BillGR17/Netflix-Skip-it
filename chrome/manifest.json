@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Netflix Skip it!",
+  "version": "1.5",
+  "description": "Skips Intros & Disables the interrupter",
+  "icons": {
+    "48": "icon/nsi.png"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_icon": "icon/nsi.png",
+    "default_title": "Netflix Skip it! Settings",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [{
+    "matches": ["*://*.netflix.com/*"],
+    "js": ["nsi.js"]
+  }]
+}
