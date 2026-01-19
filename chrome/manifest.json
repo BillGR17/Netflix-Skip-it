@@ -1,13 +1,16 @@
 {
   "manifest_version": 3,
   "name": "Netflix Skip it!",
-  "version": "1.5",
+  "version": "1.6.0",
   "description": "Skips Intros & Disables the interrupter",
   "icons": {
     "48": "icon/nsi.png"
   },
   "permissions": [
     "storage"
+  ],
+  "host_permissions": [
+    "*://*.netflix.com/*"
   ],
   "action": {
     "default_icon": "icon/nsi.png",
